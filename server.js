@@ -22,13 +22,10 @@ mongoose.connection.on('open', function () {
 const io = socketServer(server)
 
 io.on('connection', socket => {
-  console.log(socket.id)
-
   // join room
   socket.on('join', async (gameId, cb) => {
     try {
       await socket.join(gameId)
-      console.log('joined', gameId)
       cb()
     } catch (error) {
       console.log(error)
@@ -37,59 +34,22 @@ io.on('connection', socket => {
 
   // move made
   socket.on('move_made', async (room, row, col) => {
-    console.log(room, row, col)
-    socket.to(room).emit('update_board', row, col)
+    try {
+      await socket.to(room).emit('update_board', row, col)
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   // finish
   socket.on('finshed', async (message, room) => {
-    console.log('finish', message, room)
-    socket.to(room).emit('result', message)
+    try {
+      socket.to(room).emit('result', message)
+    } catch (error) {
+      console.log(error)
+    }
   })
 })
-
-// io.on('connection', socket => {
-//   socket.on('join', async room_id => {
-//     console.log('a user want to join', room_id)
-//     await socket.join(room_id)
-//   })
-
-//   socket.on('login', async data => {
-//     const user = await User.findOne({ username: data.username })
-
-//     // const oyo_room = await Room.findOne({ uID: room_id })
-//     // .catch((err) => {
-//     //     console.log('error occured while checking room',err)
-//     // });
-
-//     // if ( oyo_room && oyo_room.noOfUser === 2 ) {
-//     //     io.to(room_id).emit('youCanPLayNow');
-//     // }
-//   })
-
-//
-//   // incoming message from chat.js
-//   socket.on('sendMessage', async ({ message, name, user_id, room_id }) => {
-//     const msgToStore = {
-//       name,
-//       user_id,
-//       room_id,
-//       text: message
-//     }
-
-//     io.to(room_id).emit('messageReceived', msgToStore)
-//   })
-
-//   socket.on('playAgain', room_id => {
-//     io.to(room_id).emit('playAgainReceived')
-//   })
-// })
-
-// Start Up Server
-// const PORT = process.env.PORT || 5000
-// http.listen(PORT, () => {
-//   console.log('Backend Server listing at PORT:', PORT)
-// })
 
 server.listen(5000, () => {
   console.log('Server is listening at 5000')
