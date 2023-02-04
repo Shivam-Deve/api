@@ -1,15 +1,16 @@
 {
     "version": 2,
+    "name": "tic tac toe",
     "builds": [
         {
-            "src": "./server.js",
+            "src": "server.js",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
-            "src": "/(*)",
-            "dest": "/"
+            "src": "/(.*)",
+            "dest": "/server.js"
         }
     ]
 }
